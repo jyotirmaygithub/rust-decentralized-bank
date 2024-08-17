@@ -1,1 +1,5 @@
-service : { greet : () -> (); withdraw : (int32) -> () }
+service : {
+  current_amount : () -> (int32) query;
+  greet : () -> ();
+  withdraw : (int32) -> (int32);
+}

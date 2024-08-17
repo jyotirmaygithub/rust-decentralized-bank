@@ -1,7 +1,8 @@
-use candid::{types::result, Nat};
+use candid::types::result;
 use ic_cdk::export_candid;
 
 static mut COUNT: i32 = 1;
+static mut AMOUNT: i32 = 10000;
 
 // these are the macros which we need to write so that they can be expose at the time of building the candid file.
 #[ic_cdk::update]
@@ -11,7 +12,7 @@ fn greet() {
         COUNT += 2;
         ic_cdk::println!("Updated count: {}", COUNT);
     }
-    decrement() 
+    decrement()
 }
 
 fn decrement() {
@@ -22,11 +23,21 @@ fn decrement() {
 }
 
 #[ic_cdk::update]
-fn withdraw(num: i32){
-    let amount :i32 = 10000;
-    let  result :i32 = amount - num;
-    ic_cdk::println!("remaining amount {}", result);
+fn withdraw(num: i32) -> i32 {
+    unsafe {
+        if AMOUNT >= num {
+            AMOUNT = AMOUNT - num;
+            ic_cdk::println!("remaining amount {}", AMOUNT);
+            AMOUNT
+        } else {
+            ic_cdk::println!("withdrawing account is more than what you have");
+            AMOUNT
+        }
+    }
 }
 
-// we have a another intersting stuff in icp which is off stable which kind of stores the data even after refreshing.
+#[ic_cdk::query]
+fn current_amount() -> i32 {
+    unsafe { AMOUNT }
+}
 export_candid!();
